@@ -23,8 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
@@ -82,17 +76,7 @@ private fun CharactersContent(
     // Création d'un LazyListState pour suivre l'état de défilement.
     val listState = rememberLazyListState()
 
-    LaunchedEffect(key1 = listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .distinctUntilChanged()
-            .filterNotNull()
-            .filter { lastIndex ->
-                val totalItemCount = state.characters.size
-                lastIndex >= totalItemCount - 1 && !state.isLoading // Ajoutez une vérification pour isLoading dans votre état si nécessaire
-            }.collect {
-                onAction(CharactersAction.LoadMore)
-            }
-    }
+
     Scaffold(topBar = {
         Text(
             modifier = Modifier

@@ -43,8 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.forEach
 import org.mathieu.cleanrmapi.domain.models.episode.Episode
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
 import org.mathieu.cleanrmapi.ui.core.theme.Purple40
@@ -161,7 +159,7 @@ private fun CharacterDetailsContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(text = state.name)
-                    EpisodesList(episodesFlow = state.episodes)
+                    EpisodesList(episodes = state.episodes)
 
                 }
 
@@ -178,8 +176,7 @@ private fun CharacterDetailsPreview() = PreviewContent {
     CharacterDetailsContent()
 }
 @Composable
-fun EpisodesList(episodesFlow: Flow<List<Episode>>) {
-    val episodes = episodesFlow.collectAsState(initial = emptyList()).value
+fun EpisodesList(episodes: List<Episode>) {
 
     LazyColumn {
         items(episodes) { episode ->

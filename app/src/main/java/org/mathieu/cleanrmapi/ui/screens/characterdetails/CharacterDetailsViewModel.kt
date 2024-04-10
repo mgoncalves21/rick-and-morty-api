@@ -2,8 +2,6 @@ package org.mathieu.cleanrmapi.ui.screens.characterdetails
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import org.mathieu.cleanrmapi.domain.models.episode.Episode
@@ -16,6 +14,7 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
 
     private val characterRepository: CharacterRepository by inject()
     private val episodeRepository: EpisodeRepository by inject()
+    private var transform: (String) -> String = {it.split("/").last()}
 
     fun init(characterId: Int) {
         updateState { copy(isLoading = true) }
@@ -23,7 +22,7 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
         viewModelScope.launch {
             try {
                 val character = characterRepository.getCharacter(id = characterId)
-                val episodeIds = character.episodes // Assurez-vous que ceci retourne une liste d'IDs d'épisodes
+                val episodeIds = character.episodes.map(transform)
                 val episodesFlow = episodeRepository.getEpisodes(episodeIds)
 
                 episodesFlow.collect { episodes ->
@@ -56,6 +55,6 @@ data class CharacterDetailsState(
     val isLoading: Boolean = true,
     val avatarUrl: String = "",
     val name: String = "",
-    val episodes: Flow<List<Episode>> = emptyFlow(),
+    val episodes: List<Episode> = emptyList(),
     val error: String? = null
 )

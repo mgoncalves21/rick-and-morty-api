@@ -9,7 +9,6 @@ import org.mathieu.cleanrmapi.data.repositories.tryOrNull
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.domain.models.character.CharacterGender
 import org.mathieu.cleanrmapi.domain.models.character.CharacterStatus
-import org.mathieu.cleanrmapi.domain.models.episode.Episode
 
 /**
  * Represents a character entity stored in the SQLite database. This object provides fields
@@ -60,7 +59,7 @@ internal fun CharacterResponse.toRealmObject() = CharacterObject().also { obj ->
     obj.locationId = tryOrNull { location.url.split("/").last().toInt() } ?: -1
     obj.image = image
     obj.created = created
-    obj.episodes.addAll(episodes)
+    obj.episodes.addAll(episode)
 }
 
 internal fun CharacterObject.toModel() = Character(

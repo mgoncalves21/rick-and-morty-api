@@ -12,7 +12,7 @@ data class Episode(
     val name: String,
     val airDate: String,
     val episode: String,
-    val characters: List<String>, // Liste d'URLs de personnages
+    val characters: List<String>,
     val url: String,
     val created: String
 )

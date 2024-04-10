@@ -9,12 +9,29 @@ import org.mathieu.cleanrmapi.data.remote.responses.EpisodeResponse
 internal class EpisodeApi(private val client: HttpClient) {
 
     suspend fun getEpisodes(ids: List<String>): List<EpisodeResponse> {
-        val response = client.get("https://rickandmortyapi.com/api/episode/${ids.joinToString(",")}")
-        if (response.status == HttpStatusCode.OK) {
-            return response.body()
-        } else {
-            throw Exception("Failed to fetch episodes: ${response.status}")
+        return when {
+            ids.isEmpty() -> {
+                // Gestion des cas où aucune ID n'est fournie
+                emptyList()
+            }
+            ids.size == 1 -> {
+                // Cas où un seul ID est fourni
+                val response = client.get("episode/${ids.first()}")
+                if (response.status == HttpStatusCode.OK) {
+                    listOf(response.body())
+                } else {
+                    throw Exception("Failed to fetch episode: ${response.status}")
+                }
+            }
+            else -> {
+                // Cas où plusieurs IDs sont fournis
+                val response = client.get("episode/${ids.joinToString(",")}")
+                if (response.status == HttpStatusCode.OK) {
+                    response.body()
+                } else {
+                    throw Exception("Failed to fetch episodes: ${response.status}")
+                }
+            }
         }
     }
-
 }

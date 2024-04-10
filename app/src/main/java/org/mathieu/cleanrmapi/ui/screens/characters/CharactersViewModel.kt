@@ -1,16 +1,11 @@
 package org.mathieu.cleanrmapi.ui.screens.characters
 
 import android.app.Application
-import android.webkit.ConsoleMessage
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import org.koin.core.component.inject
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.domain.repositories.CharacterRepository
 import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.ViewModel
-import java.io.Console
-import kotlin.math.log
 
 sealed interface CharactersAction {
     data class SelectedCharacter(val character: Character): CharactersAction
@@ -50,9 +45,9 @@ class CharactersViewModel(application: Application) : ViewModel<CharactersState>
     }
 
     private fun loadMoreCharacters() {
-        viewModelScope.launch {
-            characterRepository.loadMore()
-        }
+        //viewModelScope.launch {
+       //     characterRepository.loadMore()
+        //}
     }
     private fun selectedCharacter(character: Character) =
         sendEvent(Destination.CharacterDetails(character.id.toString()))
