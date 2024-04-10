@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -22,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +39,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
@@ -63,7 +70,6 @@ fun CharactersScreen(navController: NavController) {
         state = state,
         onAction = viewModel::handleAction
     )
-
 }
 
 
@@ -72,55 +78,71 @@ fun CharactersScreen(navController: NavController) {
 private fun CharactersContent(
     state: UIState = UIState(),
     onAction: (UIAction) -> Unit = { }
-) = Scaffold(topBar = {
-    Text(
-        modifier = Modifier
-            .background(Purple40)
-            .padding(16.dp)
-            .fillMaxWidth(),
-        text = "Characters",
-        textAlign = TextAlign.Center,
-        color = Color.White,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium
-    )
-}) { paddingValues ->
+) {
+    // Création d'un LazyListState pour suivre l'état de défilement.
+    val listState = rememberLazyListState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-        AnimatedContent(targetState = state.error != null, label = "") {
-            state.error?.let { error ->
-                Text(
-                    modifier = Modifier.padding(16.dp),
-                    text = error,
-                    textAlign = TextAlign.Center,
-                    color = Purple40,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 36.sp
-                )
-            } ?: LazyColumn {
+    LaunchedEffect(key1 = listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .filterNotNull()
+            .filter { lastIndex ->
+                val totalItemCount = state.characters.size
+                lastIndex >= totalItemCount - 1 && !state.isLoading // Ajoutez une vérification pour isLoading dans votre état si nécessaire
+            }.collect {
+                onAction(CharactersAction.LoadMore)
+            }
+    }
+    Scaffold(topBar = {
+        Text(
+            modifier = Modifier
+                .background(Purple40)
+                .padding(16.dp)
+                .fillMaxWidth(),
+            text = "Characters",
+            textAlign = TextAlign.Center,
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }) { paddingValues ->
 
-                items(state.characters) {
-                    CharacterCard(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                onAction(CharactersAction.SelectedCharacter(it))
-                            },
-                        character = it
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedContent(targetState = state.error != null, label = "") {
+                state.error?.let { error ->
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = error,
+                        textAlign = TextAlign.Center,
+                        color = Purple40,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 36.sp
                     )
-                }
+                } ?: LazyColumn(state = listState) {
 
+                    items(state.characters) {
+                        CharacterCard(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onAction(CharactersAction.SelectedCharacter(it))
+                                },
+                            character = it
+                        )
+                    }
+
+                }
             }
         }
     }
-
 }
+
 
 @Composable
 private fun CharacterCard(

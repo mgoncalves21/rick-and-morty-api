@@ -1,5 +1,6 @@
 package org.mathieu.cleanrmapi.data.repositories
 
+import CharacterResponse
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -12,7 +13,6 @@ import org.mathieu.cleanrmapi.data.local.objects.CharacterObject
 import org.mathieu.cleanrmapi.data.local.objects.toModel
 import org.mathieu.cleanrmapi.data.local.objects.toRealmObject
 import org.mathieu.cleanrmapi.data.remote.CharacterApi
-import org.mathieu.cleanrmapi.data.remote.responses.CharacterResponse
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.domain.repositories.CharacterRepository
 

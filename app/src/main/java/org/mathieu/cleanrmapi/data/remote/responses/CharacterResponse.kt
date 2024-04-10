@@ -1,6 +1,6 @@
-package org.mathieu.cleanrmapi.data.remote.responses
 
 import kotlinx.serialization.Serializable
+import org.mathieu.cleanrmapi.domain.models.episode.Episode
 
 /**
  * Represents detailed information about a character, typically received from an API response.
@@ -29,11 +29,10 @@ internal data class CharacterResponse(
     val origin: CharacterLocationResponse,
     val location: CharacterLocationResponse,
     val image: String,
-    val episode: List<String>,
+    val episodes: List<String>,
     val url: String,
     val created: String,
 )
 
 @Serializable
 internal data class CharacterLocationResponse(val name: String, val url: String)
-
