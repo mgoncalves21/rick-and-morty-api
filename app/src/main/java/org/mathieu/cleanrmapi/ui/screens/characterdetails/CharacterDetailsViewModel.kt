@@ -23,16 +23,20 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
         viewModelScope.launch {
             try {
                 val character = characterRepository.getCharacter(id = characterId)
+                val episodeIds = character.episodes // Assurez-vous que ceci retourne une liste d'IDs d'épisodes
+                val episodesFlow = episodeRepository.getEpisodes(episodeIds)
 
-                updateState {
-                    copy(
-                        avatarUrl = character.avatarUrl,
-                        name = character.name,
-                        isLoading = false,
-                        error = null
-                    )
+                episodesFlow.collect { episodes ->
+                    updateState {
+                        copy(
+                            avatarUrl = character.avatarUrl,
+                            name = character.name,
+                            episodes = episodes,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
-
 
             } catch (e: Exception) {
                 updateState {

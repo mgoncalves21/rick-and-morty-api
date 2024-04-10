@@ -30,7 +30,6 @@ private val Context.dataStore by preferencesDataStore(
 )
 
 internal class EpisodeRepositoryImpl(
-    private val context: Context,
     private val episodeApi: EpisodeApi,
     private val episodeLocal: EpisodeLocal
 ) : EpisodeRepository {

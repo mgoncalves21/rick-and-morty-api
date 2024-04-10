@@ -37,6 +37,6 @@ val dataModule = module {
 
     single { EpisodeApi(get()) }
 
-    single<EpisodeRepository> { EpisodeRepositoryImpl(get(), get(), get()) }
+    single<EpisodeRepository> { EpisodeRepositoryImpl(get(), get()) }
 
 }
