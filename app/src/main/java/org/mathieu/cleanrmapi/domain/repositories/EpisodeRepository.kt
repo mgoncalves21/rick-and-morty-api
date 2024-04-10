@@ -5,6 +5,6 @@ import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.domain.models.episode.Episode
 
 interface EpisodeRepository {
-    suspend fun getEpisodes(): Flow<List<Episode>>
+    suspend fun getEpisodes(ids: List<String>): Flow<List<Episode>>
 
 }

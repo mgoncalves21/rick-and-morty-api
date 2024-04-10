@@ -5,7 +5,6 @@ import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.mathieu.cleanrmapi.data.local.objects.CharacterObject
-import org.mathieu.cleanrmapi.data.local.objects.EpisodeObject
 
 internal class CharacterLocal(private val database: RealmDatabase) {
 

@@ -33,11 +33,7 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
                     )
                 }
 
-                val episodes = episodeRepository.getEpisodes()
-                    updateState { copy(
-                        episodes = episodes
-                    )
-                }
+
             } catch (e: Exception) {
                 updateState {
                     copy(

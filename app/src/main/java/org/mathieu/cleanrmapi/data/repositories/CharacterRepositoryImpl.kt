@@ -35,19 +35,6 @@ internal class CharacterRepositoryImpl(
             .mapElement(transform = CharacterObject::toModel)
             .also { if (it.first().isEmpty()) fetchNext() }
 
-
-    /**
-     * Fetches the next batch of characters and saves them to local storage.
-     *
-     * This function works as follows:
-     * 1. Reads the next page number from the data store.
-     * 2. If there's a valid next page (i.e., page is not -1), it fetches characters from the API for that page.
-     * 3. Extracts the next page number from the API response and updates the data store with it.
-     * 4. Transforms the fetched character data into their corresponding realm objects.
-     * 5. Saves the transformed realm objects to the local database.
-     *
-     * Note: If the `next` attribute from the API response is null or missing, the page number is set to -1, indicating there's no more data to fetch.
-     */
     private suspend fun fetchNext() {
 
         val page = context.dataStore.data.map { prefs -> prefs[nextPage] }.first()
@@ -70,20 +57,6 @@ internal class CharacterRepositoryImpl(
 
     override suspend fun loadMore() = fetchNext()
 
-
-    /**
-     * Retrieves the character with the specified ID.
-     *
-     * The function follows these steps:
-     * 1. Tries to fetch the character from the local storage.
-     * 2. If not found locally, it fetches the character from the API.
-     * 3. Upon successful API retrieval, it saves the character to local storage.
-     * 4. If the character is still not found, it throws an exception.
-     *
-     * @param id The unique identifier of the character to retrieve.
-     * @return The [Character] object representing the character details.
-     * @throws Exception If the character cannot be found both locally and via the API.
-     */
     override suspend fun getCharacter(id: Int): Character =
         characterLocal.getCharacter(id)?.toModel()
             ?: characterApi.getCharacter(id = id)?.let { response ->

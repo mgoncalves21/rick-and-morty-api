@@ -35,41 +35,16 @@ internal class EpisodeRepositoryImpl(
     private val episodeLocal: EpisodeLocal
 ) : EpisodeRepository {
 
-    override suspend fun getEpisodes(): Flow<List<Episode>> =
+    override suspend fun getEpisodes(ids: List<String>): Flow<List<Episode>> =
         episodeLocal
-            .getEpisodes()
+            .getEpisodes(ids)
             .mapElement(transform = EpisodeObject::toModel)
-            .also { if (it.first().isEmpty()) fetchEpisodes() }
+            .also { if (it.first().isEmpty()) fetchEpisodes(ids) }
 
-    /**
-     * Fetches the next batch of characters and saves them to local storage.
-     *
-     * This function works as follows:
-     * 1. Reads the next page number from the data store.
-     * 2. If there's a valid next page (i.e., page is not -1), it fetches characters from the API for that page.
-     * 3. Extracts the next page number from the API response and updates the data store with it.
-     * 4. Transforms the fetched character data into their corresponding realm objects.
-     * 5. Saves the transformed realm objects to the local database.
-     *
-     * Note: If the `next` attribute from the API response is null or missing, the page number is set to -1, indicating there's no more data to fetch.
-     */
-    private suspend fun fetchEpisodes() {
-
-        val page = context.dataStore.data.map { prefs -> prefs[nextPage] }.first()
-
-        if (page != -1) {
-
-            val response = episodeApi.getEpisodes(page)
-
-            val nextPageToLoad = response.info.next?.split("?page=")?.last()?.toInt() ?: -1
-
-            context.dataStore.edit { prefs -> prefs[nextPage] = nextPageToLoad }
-
-            val objects = response.results.map(transform = EpisodeResponse::toRealmObject)
-
-            episodeLocal.saveEpisodes(objects)
-        }
-
+    private suspend fun fetchEpisodes(ids: List<String>) {
+        val responses = episodeApi.getEpisodes(ids)
+        val episodes = responses.map { it.toRealmObject() }
+        episodeLocal.saveEpisodes(episodes)
     }
 
     fun <T> tryOrNull(block: () -> T) = try {
